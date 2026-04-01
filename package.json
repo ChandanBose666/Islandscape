@@ -1,0 +1,37 @@
+{
+  "name": "astro-island-visualizer",
+  "displayName": "Astro Island Visualizer",
+  "description": "Visualize Astro island hydration costs, dependencies, and optimization opportunities directly in your editor.",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other", "Visualization"],
+  "activationEvents": ["workspaceContains:**/astro.config.*"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "astroIslands.analyzeFile",
+        "title": "Astro Islands: Analyze Current File"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "watch": "node esbuild.config.js --watch",
+    "compile": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "esbuild": "^0.20.0",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "dependencies": {
+    "@astrojs/compiler": "^2.3.0",
+    "es-module-lexer": "^1.4.1",
+    "tsconfig-paths": "^4.2.0"
+  }
+}
