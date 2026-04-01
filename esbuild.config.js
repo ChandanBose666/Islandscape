@@ -6,7 +6,7 @@ const buildOptions = {
   entryPoints: ['src/extension.ts'],
   bundle: true,
   outfile: 'out/extension.js',
-  external: ['vscode'],
+  external: ['vscode', '@astrojs/compiler'],
   format: 'cjs',
   platform: 'node',
   target: 'node20',

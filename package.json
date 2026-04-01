@@ -3,6 +3,7 @@
   "displayName": "Astro Island Visualizer",
   "description": "Visualize Astro island hydration costs, dependencies, and optimization opportunities directly in your editor.",
   "version": "0.1.0",
+  "publisher": "astro-tools",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other", "Visualization"],
   "activationEvents": ["workspaceContains:**/astro.config.*"],
@@ -23,7 +24,7 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "1.85.0",
     "@types/node": "^20.0.0",
     "typescript": "^5.3.0",
     "esbuild": "^0.20.0",

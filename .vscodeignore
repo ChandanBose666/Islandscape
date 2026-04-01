@@ -2,6 +2,7 @@
 .vscode-test/**
 src/**
 node_modules/**
+!node_modules/@astrojs/compiler/**
 .gitignore
 .eslintrc.json
 esbuild.config.js
