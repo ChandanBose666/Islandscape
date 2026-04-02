@@ -25,8 +25,9 @@ export interface IslandNode {
   framework: Framework;
   directive: HydrationDirective;
   directiveValue: string | null;       // e.g. "(min-width: 768px)" for client:media, "react" for client:only
-  estimatedSizeBytes: number | null;   // null until Phase 2 size estimation
-  estimatedSizeGzip: number | null;    // null until Phase 2 size estimation
+  estimatedSizeBytes: number | null;   // null until size estimation runs
+  estimatedSizeGzip: number | null;    // null until size estimation runs
+  sizeIsHeuristic: boolean | null;     // true = fs.stat estimate (svelte/vue), false = esbuild
   props: PropInfo[];
   position: {
     line: number;    // 0-indexed line in the host file
