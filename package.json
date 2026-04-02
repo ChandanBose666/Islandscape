@@ -14,7 +14,23 @@
         "command": "astroIslands.analyzeFile",
         "title": "Astro Islands: Analyze Current File"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Astro Island Visualizer",
+      "properties": {
+        "astroIslands.eagerSizeThresholdKB": {
+          "type": "number",
+          "default": 50,
+          "description": "Islands larger than this (gzipped KB) using client:load will trigger a warning."
+        },
+        "astroIslands.budgets": {
+          "type": "object",
+          "default": {},
+          "description": "Per-route JS budget in KB. Keys are route patterns (e.g. '/product/*'). Status bar turns red when exceeded.",
+          "additionalProperties": { "type": "number" }
+        }
+      }
+    }
   },
   "scripts": {
     "build": "node esbuild.config.js",
@@ -27,11 +43,11 @@
     "@types/vscode": "1.85.0",
     "@types/node": "^20.0.0",
     "typescript": "^5.3.0",
-    "esbuild": "^0.20.0",
     "@vscode/vsce": "^2.22.0"
   },
   "dependencies": {
     "@astrojs/compiler": "^2.3.0",
+    "esbuild": "^0.20.0",
     "es-module-lexer": "^1.4.1",
     "tsconfig-paths": "^4.2.0"
   }

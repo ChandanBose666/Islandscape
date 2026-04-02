@@ -68,6 +68,7 @@ function extractIslands(root: RootNode, hostFile: string): IslandNode[] {
       directiveValue,
       estimatedSizeBytes: null,
       estimatedSizeGzip: null,
+      sizeIsHeuristic: null,
       props,
       position: { line, column },
     });
