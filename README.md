@@ -2,8 +2,6 @@
 
 > Visualize Astro island hydration costs, dependencies, and optimization opportunities — directly in your editor.
 
-![Islandscape](assets/icon.png)
-
 [![Version](https://img.shields.io/visual-studio-marketplace/v/ChandanBose.astro-island-visualizer?label=marketplace&color=blue)](https://marketplace.visualstudio.com/items?itemName=ChandanBose.astro-island-visualizer)
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/ChandanBose.astro-island-visualizer)](https://marketplace.visualstudio.com/items?itemName=ChandanBose.astro-island-visualizer)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
