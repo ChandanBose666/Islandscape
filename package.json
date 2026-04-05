@@ -42,6 +42,14 @@
       {
         "command": "astroIslands.analyzeWorkspace",
         "title": "Astro Islands: Analyze Workspace"
+      },
+      {
+        "command": "astroIslands.jumpToLargest",
+        "title": "Astro Islands: Jump to Largest Island"
+      },
+      {
+        "command": "astroIslands.exportReport",
+        "title": "Astro Islands: Export Report"
       }
     ],
     "configuration": {

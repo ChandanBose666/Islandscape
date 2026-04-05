@@ -2,9 +2,10 @@ import { IslandNode } from '../model/islandGraph';
 import { SizeResult } from '../analyzer/cacheManager';
 
 export type SuggestionKind =
-  | 'large-eager'        // client:load + size over threshold
-  | 'unused-directive'   // no interactive logic but has a directive
-  | 'framework-entry-cost'; // sole island of its framework on the page
+  | 'large-eager'          // client:load + size over threshold
+  | 'unused-directive'     // no interactive logic but has a directive
+  | 'framework-entry-cost' // sole island of its framework on the page
+  | 'below-fold-eager';    // client:load with a name suggesting below-fold placement
 
 export interface Suggestion {
   islandId: string;
@@ -68,6 +69,23 @@ export function generateSuggestions(
         shortLabel: 'No interactive logic',
         fixLabel: 'Remove hydration directive',
       });
+    }
+
+    // Rule 2b — below-fold heuristic: client:load with a name that suggests
+    // the component lives below the fold (footer, related, sidebar, etc.)
+    if (island.directive === 'client:load') {
+      const belowFoldPattern = /footer|related|sidebar|recommend|newsletter|comment|review|social|share/i;
+      if (belowFoldPattern.test(island.componentName)) {
+        suggestions.push({
+          islandId: island.id,
+          kind: 'below-fold-eager',
+          message:
+            `${island.componentName} uses client:load but its name suggests it may be below the fold. ` +
+            `Consider client:visible so it only hydrates when scrolled into view.`,
+          shortLabel: 'Likely below fold',
+          fixLabel: 'Convert to client:visible',
+        });
+      }
     }
 
     // Rule 3 — sole island of its framework (framework entry cost)
