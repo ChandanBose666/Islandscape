@@ -1,12 +1,41 @@
+# VSCode/test tooling
 .vscode/**
 .vscode-test/**
+
+# Source — compiled to out/ by esbuild
 src/**
-node_modules/**
-!node_modules/@astrojs/compiler/**
-.gitignore
-.eslintrc.json
+webview-ui/**
+
+# Walkthrough markdown (embedded in package.json, not bundled as files)
+# Keep walkthrough/ included so VSCode can load the markdown at runtime
+
+# Config & tooling
+.github/**
+tsconfig*.json
 esbuild.config.js
-tsconfig.json
-**/*.map
-**/*.ts
-!out/**
+.eslintrc*
+.eslintignore
+
+# node_modules — runtime deps that esbuild bundles into out/ can be excluded.
+# Keep svelte and @vue/compiler-sfc because they are loaded dynamically at runtime
+# (marked external in esbuild, NOT bundled into out/extension.js).
+node_modules/**
+!node_modules/svelte/**
+!node_modules/@vue/compiler-sfc/**
+!node_modules/@vue/compiler-core/**
+!node_modules/@vue/compiler-dom/**
+!node_modules/@vue/compiler-ssr/**
+!node_modules/@vue/shared/**
+!node_modules/estree-walker/**
+!node_modules/magic-string/**
+!node_modules/postcss/**
+!node_modules/source-map-js/**
+!node_modules/@astrojs/compiler/**
+
+# Source maps (comment out to keep for debugging)
+out/**/*.map
+
+# Misc
+*.vsix
+.gitignore
+.gitattributes

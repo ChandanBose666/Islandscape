@@ -1,0 +1,39 @@
+name: Build & Package
+
+on:
+  push:
+    branches: [main, 'phase-*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Package extension
+        run: npx vsce package --no-dependencies --out astro-island-visualizer.vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: astro-island-visualizer-vsix
+          path: astro-island-visualizer.vsix
+          retention-days: 14

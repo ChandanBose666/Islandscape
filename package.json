@@ -4,6 +4,25 @@
   "description": "Visualize Astro island hydration costs, dependencies, and optimization opportunities directly in your editor.",
   "version": "0.1.0",
   "publisher": "astro-tools",
+  "icon": "assets/Islandscape Icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChandanBose666/Islandscape"
+  },
+  "bugs": {
+    "url": "https://github.com/ChandanBose666/Islandscape/issues"
+  },
+  "homepage": "https://github.com/ChandanBose666/Islandscape#readme",
+  "keywords": [
+    "astro",
+    "islands",
+    "hydration",
+    "performance",
+    "bundle size",
+    "visualization",
+    "dependency graph",
+    "webdev"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -69,7 +88,49 @@
           }
         }
       }
-    }
+    },
+    "walkthroughs": [
+      {
+        "id": "astroIslands.gettingStarted",
+        "title": "Get started with Astro Island Visualizer",
+        "description": "Learn how to visualize island hydration costs and optimize your Astro project's performance.",
+        "steps": [
+          {
+            "id": "astroIslands.step1",
+            "title": "See inline cost annotations",
+            "description": "Open any `.astro` file. Colour-coded CodeLens annotations appear above every hydrated island showing directive, framework, and gzip size.\n\n[Open an Astro file](command:workbench.action.quickOpen)",
+            "media": {
+              "markdown": "walkthrough/step1.md"
+            },
+            "completionEvents": [
+              "onCommand:astroIslands.analyzeFile"
+            ]
+          },
+          {
+            "id": "astroIslands.step2",
+            "title": "Explore the Island Map sidebar",
+            "description": "Open the Island Map panel to see the dependency graph, page view, and global impact dashboard.\n\n[Open Island Map](command:astroIslands.islandMap.focus)",
+            "media": {
+              "markdown": "walkthrough/step2.md"
+            },
+            "completionEvents": [
+              "onView:astroIslands.islandMap"
+            ]
+          },
+          {
+            "id": "astroIslands.step3",
+            "title": "Fix islands with one click",
+            "description": "Use the Problems tab or inline lightbulbs to convert directives or remove unused hydration.\n\n[Open Problems](command:workbench.actions.view.problems)",
+            "media": {
+              "markdown": "walkthrough/step3.md"
+            },
+            "completionEvents": [
+              "onCommand:astroIslands.exportReport"
+            ]
+          }
+        ]
+      }
+    ]
   },
   "scripts": {
     "build": "node esbuild.config.js",
@@ -82,6 +143,7 @@
     "@types/cytoscape": "^3.21.9",
     "@types/node": "^20.0.0",
     "@types/vscode": "1.85.0",
+    "@vscode/extension-telemetry": "^1.5.1",
     "@vscode/vsce": "^2.22.0",
     "cytoscape": "^3.33.1",
     "lit": "^3.3.2",

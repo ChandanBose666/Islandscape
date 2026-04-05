@@ -16,6 +16,7 @@ import { IslandCodeLensProvider } from './providers/codeLensProvider';
 import { IslandDiagnosticProvider } from './providers/diagnosticProvider';
 import { IslandWebviewProvider } from './webview/webviewProvider';
 import { IslandHoverProvider } from './providers/hoverProvider';
+import { initTelemetry, sendEvent } from './utils/telemetry';
 
 // ─── Module-level state ───────────────────────────────────────────────────────
 
@@ -36,6 +37,9 @@ const DEBOUNCE_MS = 300;
 // ─── Activation ───────────────────────────────────────────────────────────────
 
 export function activate(context: vscode.ExtensionContext): void {
+  initTelemetry(context);
+  sendEvent('activated');
+
   graph         = createIslandGraph();
   codeLens      = new IslandCodeLensProvider(graph);
   diagnostics   = new IslandDiagnosticProvider();
@@ -261,6 +265,7 @@ async function onAnalyzeFileCommand(): Promise<void> {
   }
   await analyzeDocument(editor.document);
   const count = getIslandsForFile(graph, editor.document.uri.fsPath).length;
+  sendEvent('analyze_file', undefined, { island_count: count });
   vscode.window.showInformationMessage(
     `Astro Islands: found ${count} island${count !== 1 ? 's' : ''} in this file.`,
   );
@@ -306,6 +311,7 @@ async function onAnalyzeWorkspaceCommand(): Promise<void> {
     },
   );
 
+  sendEvent('analyze_workspace', undefined, { file_count: astroFiles.length, island_count: graph.nodes.size });
   vscode.window.showInformationMessage(
     `Astro Islands: analysed ${astroFiles.length} files — ${graph.nodes.size} islands found.`,
   );
@@ -385,6 +391,7 @@ async function onExportReport(): Promise<void> {
   }
 
   fs.writeFileSync(uri.fsPath, content, 'utf8');
+  sendEvent('export_report', { format: ext ?? 'md' }, { island_count: islands.length });
   vscode.window.showInformationMessage(`Report exported to ${path.basename(uri.fsPath)}.`);
 }
 
