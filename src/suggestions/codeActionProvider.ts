@@ -41,6 +41,8 @@ function buildAction(
   switch (suggestion.kind) {
     case 'large-eager':
       return replaceDirectiveAction(document, island, 'client:load', 'client:idle', suggestion.fixLabel);
+    case 'below-fold-eager':
+      return replaceDirectiveAction(document, island, 'client:load', 'client:visible', suggestion.fixLabel);
     case 'unused-directive':
       return removeDirectiveAction(document, island, suggestion.fixLabel);
     default:

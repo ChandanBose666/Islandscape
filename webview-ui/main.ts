@@ -1,6 +1,7 @@
 import './components/island-list';
 import './components/page-view';
 import './components/island-graph';
+import './components/cost-dashboard';
 
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -13,7 +14,7 @@ declare function acquireVsCodeApi(): {
 
 const vscode = acquireVsCodeApi();
 
-type Tab = 'list' | 'page' | 'graph';
+type Tab = 'list' | 'page' | 'graph' | 'dash';
 
 @customElement('island-app')
 class IslandApp extends LitElement {
@@ -50,6 +51,7 @@ class IslandApp extends LitElement {
         ${this.tabButton('list',  '🏝 Islands')}
         ${this.tabButton('page',  '📄 Page')}
         ${this.tabButton('graph', '🕸 Graph')}
+        ${this.tabButton('dash',  '📊 Impact')}
       </div>
 
       <div class="tab-content ${this.tab === 'list' ? 'visible' : ''}">
@@ -72,6 +74,13 @@ class IslandApp extends LitElement {
           @reveal-island=${this.onRevealIsland}
           @reveal-file=${this.onRevealFile}>
         </island-graph>
+      </div>
+
+      <div class="tab-content ${this.tab === 'dash' ? 'visible' : ''}">
+        <cost-dashboard
+          .payload=${this.payload}
+          @reveal-island=${this.onRevealIsland}>
+        </cost-dashboard>
       </div>`;
   }
 

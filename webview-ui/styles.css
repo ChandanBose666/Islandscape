@@ -182,3 +182,121 @@ body {
   width: 100%;
   height: calc(100vh - 31px);
 }
+
+/* ── Cost dashboard ─────────────────────────────────────────────────────── */
+.sub {
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  margin-left: 4px;
+}
+
+.budget-section {
+  margin: 8px 0 12px;
+}
+
+/* ── Hydration waterfall ────────────────────────────────────────────────── */
+.waterfall {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+
+.wf-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 2px 0;
+  font-size: 11px;
+}
+
+.wf-row:hover { background: var(--vscode-list-hoverBackground); }
+
+.wf-timing {
+  width: 50px;
+  text-align: right;
+  color: var(--vscode-descriptionForeground);
+  font-family: var(--vscode-editor-font-family, monospace);
+  flex-shrink: 0;
+}
+
+.wf-bar-wrap {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.wf-bar {
+  height: 8px;
+  border-radius: 2px;
+  min-width: 4px;
+}
+
+.wf-bar.dir-load    { background: rgba(255,80,80,0.7); }
+.wf-bar.dir-idle    { background: rgba(255,190,0,0.7); }
+.wf-bar.dir-visible { background: rgba(70,200,70,0.7); }
+.wf-bar.dir-media   { background: rgba(80,120,255,0.7); }
+.wf-bar.dir-only    { background: rgba(160,80,220,0.7); }
+
+.wf-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wf-axis {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  padding-left: 56px;
+  margin-top: 2px;
+}
+
+/* ── Global User Impact ─────────────────────────────────────────────────── */
+.impact-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.impact-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.impact-row .network {
+  width: 24px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.impact-row .region {
+  flex: 1;
+  color: var(--vscode-descriptionForeground);
+  min-width: 0;
+}
+
+.impact-row .time {
+  white-space: nowrap;
+}
+
+.impact-row .time.warn {
+  color: var(--vscode-problemsWarningIcon-foreground);
+}
+
+.warn-icon { margin-left: 2px; }
+
+.note {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  line-height: 1.5;
+}
