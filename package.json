@@ -1,8 +1,8 @@
 {
   "name": "astro-island-visualizer",
-  "displayName": "Astro Island Visualizer",
+  "displayName": "Islandscape",
   "description": "Visualize Astro island hydration costs, dependencies, and optimization opportunities directly in your editor.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "ChandanBose",
   "icon": "assets/icon.png",
   "repository": {
