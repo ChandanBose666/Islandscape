@@ -1,8 +1,12 @@
-# Astro Island Visualizer
+# Islandscape
 
 > Visualize Astro island hydration costs, dependencies, and optimization opportunities — directly in your editor.
 
-![Astro Island Visualizer](assets/Islandscape%20Icon.png)
+![Islandscape](assets/icon.png)
+
+[![Version](https://img.shields.io/visual-studio-marketplace/v/ChandanBose.astro-island-visualizer?label=marketplace&color=blue)](https://marketplace.visualstudio.com/items?itemName=ChandanBose.astro-island-visualizer)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/ChandanBose.astro-island-visualizer)](https://marketplace.visualstudio.com/items?itemName=ChandanBose.astro-island-visualizer)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
 
@@ -10,7 +14,7 @@
 
 Astro's islands architecture is powerful but opaque. As projects grow, it becomes impossible to know at a glance which components ship JavaScript, what each one costs, or when they hydrate.
 
-This extension makes all of that visible — without leaving VSCode.
+Islandscape makes all of that visible — without leaving VSCode.
 
 ---
 
@@ -37,12 +41,12 @@ Above every hydrated island, a colour-coded annotation appears automatically:
 
 ### 🗺️ Island Map Sidebar
 
-Click the **Astro Islands** icon in the activity bar to open the Island Map panel. It has four tabs:
+Click the **Islandscape** icon in the activity bar to open the Island Map panel. It has four tabs:
 
-#### Islands tab
+#### 🏝 Islands tab
 Flat list of every island in the active file — framework badge, directive, gzip size, and any active warnings.
 
-#### Page tab
+#### 📄 Page tab
 Virtual page assembly: aggregate stats for the active file including budget tracking.
 
 ```
@@ -54,7 +58,7 @@ Page View: /product/[id].astro
   Total: ~98 KB  /  150 KB budget  ✓
 ```
 
-#### Graph tab
+#### 🕸 Graph tab
 Interactive dependency DAG powered by Cytoscape.js:
 - **Rectangles** — Astro pages
 - **Rounded rectangles** — island components (colour-coded by framework)
@@ -62,7 +66,7 @@ Interactive dependency DAG powered by Cytoscape.js:
 - **Dashed edges** — state-sharing relationships
 - Click any node to navigate to its source file
 
-#### Impact tab
+#### 📊 Impact tab
 - **Hydration waterfall** — shows when each island hydrates relative to page load
 - **Global User Impact** — load-time estimates by network/region (4G → 2G)
 - **Budget bar** — visual indicator of JS budget utilisation
@@ -114,8 +118,10 @@ Hover over any island component name to see a detailed breakdown:
 
 1. Open VSCode
 2. Go to Extensions (`Ctrl+Shift+X`)
-3. Search for **Astro Island Visualizer**
+3. Search for **Islandscape**
 4. Click Install
+
+Or install directly from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ChandanBose.astro-island-visualizer).
 
 The extension activates automatically in any workspace that contains an `astro.config.*` file.
 
@@ -158,7 +164,7 @@ Results are cached by file content hash and invalidated on save.
 
 ## Privacy & Telemetry
 
-This extension collects **anonymous usage events** (e.g. "extension activated", "workspace analysed") when VSCode's global telemetry setting is enabled. No source code, file paths, component names, or personal data are ever collected. You can disable telemetry globally in VSCode via `telemetry.telemetryLevel`.
+Islandscape collects **anonymous usage events** (e.g. "extension activated", "workspace analysed") when VSCode's global telemetry setting is enabled. No source code, file paths, component names, or personal data are ever collected. You can disable telemetry globally in VSCode via `telemetry.telemetryLevel`.
 
 ---
 
@@ -172,3 +178,7 @@ This extension collects **anonymous usage events** (e.g. "extension activated", 
 ## Contributing
 
 Issues and PRs welcome at [github.com/ChandanBose666/Islandscape](https://github.com/ChandanBose666/Islandscape).
+
+## License
+
+[MIT](LICENSE) © Chandan Bose
