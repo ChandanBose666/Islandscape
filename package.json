@@ -4,7 +4,7 @@
   "description": "Visualize Astro island hydration costs, dependencies, and optimization opportunities directly in your editor.",
   "version": "0.1.0",
   "publisher": "ChandanBose",
-  "icon": "assets/Islandscape Icon.png",
+  "icon": "assets/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/ChandanBose666/Islandscape"
