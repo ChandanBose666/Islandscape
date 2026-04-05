@@ -6,16 +6,20 @@ import { detectFramework } from './analyzer/frameworkDetector';
 import { CacheManager } from './analyzer/cacheManager';
 import { SizeEstimator } from './analyzer/sizeEstimator';
 import { hasInteractiveLogic } from './analyzer/unusedDirectiveChecker';
+import { groupBySharedStore } from './analyzer/nanostoreDetector';
+import { analyzePropSerializationCost } from './analyzer/propAnalyzer';
 import { generateSuggestions, Suggestion } from './suggestions/suggestionEngine';
 import { IslandCodeActionProvider } from './suggestions/codeActionProvider';
 import { IslandCodeLensProvider } from './providers/codeLensProvider';
 import { IslandDiagnosticProvider } from './providers/diagnosticProvider';
+import { IslandWebviewProvider } from './webview/webviewProvider';
 
 // ─── Module-level state ───────────────────────────────────────────────────────
 
 let graph: IslandGraph;
 let codeLens: IslandCodeLensProvider;
 let diagnostics: IslandDiagnosticProvider;
+let webviewProvider: IslandWebviewProvider;
 let statusBar: vscode.StatusBarItem;
 let sizeEstimator: SizeEstimator;
 
@@ -33,6 +37,11 @@ export function activate(context: vscode.ExtensionContext): void {
   codeLens      = new IslandCodeLensProvider(graph);
   diagnostics   = new IslandDiagnosticProvider();
   sizeEstimator = new SizeEstimator(new CacheManager());
+  webviewProvider = new IslandWebviewProvider(
+    context.extensionUri,
+    graph,
+    (hostFile) => suggestionsMap.get(hostFile) ?? [],
+  );
 
   statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBar.command = 'astroIslands.analyzeFile';
@@ -41,6 +50,14 @@ export function activate(context: vscode.ExtensionContext): void {
   const codeActions = new IslandCodeActionProvider(
     graph,
     (hostFile) => suggestionsMap.get(hostFile) ?? [],
+  );
+
+  // ── FileSystemWatcher — live updates on .astro file changes ──────────────
+  const fsWatcher = vscode.workspace.createFileSystemWatcher(
+    new vscode.RelativePattern(
+      vscode.workspace.workspaceFolders?.[0] ?? '',
+      'src/pages/**/*.astro',
+    ),
   );
 
   context.subscriptions.push(
@@ -54,8 +71,11 @@ export function activate(context: vscode.ExtensionContext): void {
       { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] },
     ),
 
-    vscode.commands.registerCommand('astroIslands.analyzeFile', onAnalyzeFileCommand),
-    vscode.commands.registerCommand('astroIslands.revealIsland', onRevealIsland),
+    vscode.window.registerWebviewViewProvider(IslandWebviewProvider.viewId, webviewProvider),
+
+    vscode.commands.registerCommand('astroIslands.analyzeFile',      onAnalyzeFileCommand),
+    vscode.commands.registerCommand('astroIslands.analyzeWorkspace', onAnalyzeWorkspaceCommand),
+    vscode.commands.registerCommand('astroIslands.revealIsland',     onRevealIsland),
 
     vscode.workspace.onDidOpenTextDocument(doc => scheduleAnalysis(doc)),
     vscode.workspace.onDidChangeTextDocument(e => scheduleAnalysis(e.document)),
@@ -64,6 +84,7 @@ export function activate(context: vscode.ExtensionContext): void {
       suggestionsMap.delete(doc.uri.fsPath);
       diagnostics.clear(doc.uri);
       updateStatusBar();
+      webviewProvider.push();
     }),
 
     // Re-analyse open .astro files when a component source file is saved
@@ -76,6 +97,26 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     }),
 
+    // Notify webview when the active editor changes (tabs)
+    vscode.window.onDidChangeActiveTextEditor(editor => {
+      const activeFile = editor?.document.languageId === 'astro'
+        ? editor.document.uri.fsPath
+        : null;
+      webviewProvider.pushActiveFileChanged(activeFile);
+      updateStatusBar();
+    }),
+
+    // FileSystemWatcher events
+    fsWatcher.onDidChange(uri => reanalyzePath(uri)),
+    fsWatcher.onDidCreate(uri => reanalyzePath(uri)),
+    fsWatcher.onDidDelete(uri => {
+      removeFileFromGraph(uri.fsPath);
+      suggestionsMap.delete(uri.fsPath);
+      updateStatusBar();
+      webviewProvider.push();
+    }),
+
+    fsWatcher,
     diagnostics,
     statusBar,
   );
@@ -148,22 +189,56 @@ async function analyzeDocument(doc: vscode.TextDocument): Promise<void> {
     }
   }
 
-  // 5 — Generate suggestions
+  // 5 — Generate suggestions (engine rules + prop warnings)
   const sizeMap    = new Map(islands.map((island, i) => [island.id, sizeResults[i]]));
   const suggestions = generateSuggestions(islands, sizeMap, hasInteractiveMap, getConfig());
+
+  // Append prop-serialization warnings as info diagnostics
+  for (const island of islands) {
+    const propWarnings = analyzePropSerializationCost(island.id, island.props);
+    for (const w of propWarnings) {
+      suggestions.push({
+        islandId: w.islandId,
+        kind: 'large-eager',   // reuse kind; diagnostic provider only uses message
+        message: w.message,
+        shortLabel: `Large prop: ${w.propName}`,
+      });
+    }
+  }
+
   suggestionsMap.set(hostFile, suggestions);
 
-  // 6 — Update graph
+  // 6 — Update graph + state edges (nanostores)
   removeFileFromGraph(hostFile);
   for (const island of islands) {
     graph.nodes.set(island.id, island);
     graph.renderEdges.push({ parentFile: hostFile, islandId: island.id });
   }
+  rebuildStateEdges();
 
   // 7 — Notify providers
   codeLens.refresh();
   diagnostics.update(doc.uri, islands, suggestions);
   updateStatusBar();
+  webviewProvider.push();
+}
+
+// ─── State edges (nanostores) ─────────────────────────────────────────────────
+
+function rebuildStateEdges(): void {
+  const allIslands = [...graph.nodes.values()].map(n => ({ id: n.id, sourceFile: n.sourceFile }));
+  const storeGroups = groupBySharedStore(allIslands);
+
+  graph.stateEdges = [];
+  for (const [store, ids] of storeGroups) {
+    // Determine the store source file (use the first consumer's import path as heuristic)
+    const firstIsland = graph.nodes.get(ids[0]);
+    graph.stateEdges.push({
+      storeName: store,
+      storeSourceFile: firstIsland?.sourceFile ?? store,
+      consumerIds: ids,
+    });
+  }
 }
 
 // ─── Commands ─────────────────────────────────────────────────────────────────
@@ -181,6 +256,51 @@ async function onAnalyzeFileCommand(): Promise<void> {
   );
 }
 
+async function onAnalyzeWorkspaceCommand(): Promise<void> {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders?.length) {
+    vscode.window.showInformationMessage('No workspace open.');
+    return;
+  }
+
+  const astroFiles = await vscode.workspace.findFiles(
+    '**/*.astro',
+    '**/node_modules/**',
+    500,
+  );
+
+  if (astroFiles.length === 0) {
+    vscode.window.showInformationMessage('No .astro files found in workspace.');
+    return;
+  }
+
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Astro Islands: Analyzing workspace…',
+      cancellable: false,
+    },
+    async (progress) => {
+      let done = 0;
+      for (const uri of astroFiles) {
+        progress.report({
+          message: `${uri.fsPath.split(/[/\\]/).pop()} (${done}/${astroFiles.length})`,
+          increment: (1 / astroFiles.length) * 100,
+        });
+        try {
+          const doc = await vscode.workspace.openTextDocument(uri);
+          await analyzeDocument(doc);
+        } catch { /* skip unreadable files */ }
+        done++;
+      }
+    },
+  );
+
+  vscode.window.showInformationMessage(
+    `Astro Islands: analysed ${astroFiles.length} files — ${graph.nodes.size} islands found.`,
+  );
+}
+
 function onRevealIsland(islandId: string): void {
   const island = graph.nodes.get(islandId);
   if (!island) return;
@@ -189,6 +309,15 @@ function onRevealIsland(islandId: string): void {
     selection: new vscode.Range(position, position),
     preserveFocus: false,
   });
+}
+
+// ─── FileSystemWatcher helper ─────────────────────────────────────────────────
+
+async function reanalyzePath(uri: vscode.Uri): Promise<void> {
+  try {
+    const doc = await vscode.workspace.openTextDocument(uri);
+    await analyzeDocument(doc);
+  } catch { /* file may not be readable */ }
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

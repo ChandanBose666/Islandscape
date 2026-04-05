@@ -2,10 +2,12 @@ import * as esbuild from 'esbuild';
 import * as zlib from 'zlib';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import { CacheManager, SizeResult } from './cacheManager';
 
 const JSX_EXTENSIONS      = new Set(['.tsx', '.jsx', '.ts', '.js']);
-const HEURISTIC_EXTENSIONS = new Set(['.svelte', '.vue']);
+const SVELTE_EXTENSION    = '.svelte';
+const VUE_EXTENSION       = '.vue';
 
 // Rough gzip ratio for unminified source code
 const HEURISTIC_GZIP_RATIO = 0.35;
@@ -32,8 +34,10 @@ export class SizeEstimator {
 
     if (JSX_EXTENSIONS.has(ext)) {
       result = await this.estimateWithEsbuild(sourceFile) ?? this.estimateHeuristic(sourceFile);
-    } else if (HEURISTIC_EXTENSIONS.has(ext)) {
-      result = this.estimateHeuristic(sourceFile);
+    } else if (ext === SVELTE_EXTENSION) {
+      result = await this.estimateSvelte(sourceFile, content) ?? this.estimateHeuristic(sourceFile);
+    } else if (ext === VUE_EXTENSION) {
+      result = await this.estimateVue(sourceFile, content) ?? this.estimateHeuristic(sourceFile);
     }
 
     if (result) this.cache.set(hash, result);
@@ -70,6 +74,65 @@ export class SizeEstimator {
         isHeuristic: false,
         sharedPackages,
       };
+    } catch {
+      return null;
+    }
+  }
+
+  // ─── Svelte SFC (svelte/compiler → esbuild) ──────────────────────────────
+
+  private async estimateSvelte(sourceFile: string, content: string): Promise<SizeResult | null> {
+    try {
+      // Dynamic require keeps svelte out of the extension bundle (marked external)
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const svelte = require('svelte/compiler') as typeof import('svelte/compiler');
+      const { js } = svelte.compile(content, {
+        filename: sourceFile,
+        generate: 'client',
+        dev: false,
+      });
+
+      // Write compiled JS to a temp file so esbuild can bundle its deps
+      const tmpFile = path.join(os.tmpdir(), `aiv-svelte-${Date.now()}.js`);
+      fs.writeFileSync(tmpFile, js.code, 'utf8');
+      try {
+        return await this.estimateWithEsbuild(tmpFile) ?? null;
+      } finally {
+        fs.rmSync(tmpFile, { force: true });
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  // ─── Vue SFC (@vue/compiler-sfc → esbuild) ───────────────────────────────
+
+  private async estimateVue(sourceFile: string, content: string): Promise<SizeResult | null> {
+    try {
+      // Dynamic require keeps @vue/compiler-sfc out of the bundle
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { parse, compileScript, compileTemplate } =
+        require('@vue/compiler-sfc') as typeof import('@vue/compiler-sfc');
+
+      const { descriptor } = parse(content, { filename: sourceFile });
+      const id = `vue-${Date.now()}`;
+
+      const script = compileScript(descriptor, { id });
+      const template = compileTemplate({
+        source: descriptor.template?.content ?? '',
+        filename: sourceFile,
+        id,
+        scoped: descriptor.styles.some(s => s.scoped),
+      });
+
+      const combined = `${script.content}\n${template.code}`;
+      const tmpFile = path.join(os.tmpdir(), `aiv-vue-${id}.js`);
+      fs.writeFileSync(tmpFile, combined, 'utf8');
+      try {
+        return await this.estimateWithEsbuild(tmpFile) ?? null;
+      } finally {
+        fs.rmSync(tmpFile, { force: true });
+      }
     } catch {
       return null;
     }

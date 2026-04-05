@@ -1,0 +1,184 @@
+/* ── Reset & base ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  background: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  overflow: hidden;
+}
+
+/* ── Tab bar ────────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  background: var(--vscode-editorGroupHeader-tabsBackground);
+}
+
+.tab-bar button {
+  flex: 1;
+  padding: 6px 4px;
+  font: inherit;
+  font-size: 11px;
+  color: var(--vscode-tab-inactiveForeground);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-bar button:hover {
+  color: var(--vscode-tab-activeForeground);
+  background: var(--vscode-tab-hoverBackground);
+}
+
+.tab-bar button.active {
+  color: var(--vscode-tab-activeForeground);
+  border-bottom-color: var(--vscode-focusBorder);
+}
+
+/* ── Tab content ────────────────────────────────────────────────────────── */
+.tab-content {
+  display: none;
+  height: calc(100vh - 31px);
+  overflow-y: auto;
+}
+
+.tab-content.visible { display: block; }
+
+/* ── Empty state ────────────────────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  gap: 8px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 12px;
+  text-align: center;
+  padding: 16px;
+}
+
+.empty-state .icon { font-size: 32px; }
+
+/* ── Framework badge ────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-react    { background: #20232a; color: #61dafb; }
+.badge-svelte   { background: #ff3e00; color: #fff; }
+.badge-vue      { background: #42b883; color: #fff; }
+.badge-solid    { background: #446b9e; color: #fff; }
+.badge-preact   { background: #673ab8; color: #fff; }
+.badge-lit      { background: #324fff; color: #fff; }
+.badge-unknown  { background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
+
+/* ── Directive chip ─────────────────────────────────────────────────────── */
+.directive {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-family: var(--vscode-editor-font-family, monospace);
+}
+
+.dir-load    { background: rgba(255,80,80,0.18);   color: #ff5050; }
+.dir-idle    { background: rgba(255,190,0,0.18);   color: #ffbe00; }
+.dir-visible { background: rgba(70,200,70,0.18);   color: #46c846; }
+.dir-media   { background: rgba(80,120,255,0.18);  color: #5078ff; }
+.dir-only    { background: rgba(160,80,220,0.18);  color: #a050dc; }
+
+/* ── Island list item ───────────────────────────────────────────────────── */
+.island-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--vscode-list-inactiveSelectionBackground);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.island-item:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.island-item .name {
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.island-item .size {
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+}
+
+.island-item .warning {
+  color: var(--vscode-problemsWarningIcon-foreground);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* ── Page view ──────────────────────────────────────────────────────────── */
+.page-summary {
+  padding: 10px;
+  font-size: 12px;
+}
+
+.page-summary h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 8px;
+}
+
+.page-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid var(--vscode-panel-border);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.budget-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--vscode-progressBar-background);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.budget-bar .fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--vscode-charts-green);
+  transition: width 0.3s ease;
+}
+
+.budget-bar .fill.over-budget {
+  background: var(--vscode-charts-red);
+}
+
+/* ── Graph container ────────────────────────────────────────────────────── */
+#cy-container {
+  width: 100%;
+  height: calc(100vh - 31px);
+}

@@ -4,15 +4,44 @@
   "description": "Visualize Astro island hydration costs, dependencies, and optimization opportunities directly in your editor.",
   "version": "0.1.0",
   "publisher": "astro-tools",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Other", "Visualization"],
-  "activationEvents": ["workspaceContains:**/astro.config.*"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/astro.config.*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "astroIslands",
+          "title": "Astro Islands",
+          "icon": "$(map)"
+        }
+      ]
+    },
+    "views": {
+      "astroIslands": [
+        {
+          "type": "webview",
+          "id": "astroIslands.islandMap",
+          "name": "Island Map"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "astroIslands.analyzeFile",
         "title": "Astro Islands: Analyze Current File"
+      },
+      {
+        "command": "astroIslands.analyzeWorkspace",
+        "title": "Astro Islands: Analyze Workspace"
       }
     ],
     "configuration": {
@@ -27,7 +56,9 @@
           "type": "object",
           "default": {},
           "description": "Per-route JS budget in KB. Keys are route patterns (e.g. '/product/*'). Status bar turns red when exceeded.",
-          "additionalProperties": { "type": "number" }
+          "additionalProperties": {
+            "type": "number"
+          }
         }
       }
     }
@@ -40,15 +71,20 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "1.85.0",
+    "@types/cytoscape": "^3.21.9",
     "@types/node": "^20.0.0",
-    "typescript": "^5.3.0",
-    "@vscode/vsce": "^2.22.0"
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "^2.22.0",
+    "cytoscape": "^3.33.1",
+    "lit": "^3.3.2",
+    "typescript": "^5.3.0"
   },
   "dependencies": {
     "@astrojs/compiler": "^2.3.0",
-    "esbuild": "^0.20.0",
+    "@vue/compiler-sfc": "^3.5.32",
     "es-module-lexer": "^1.4.1",
+    "esbuild": "^0.20.0",
+    "svelte": "^5.55.1",
     "tsconfig-paths": "^4.2.0"
   }
 }

@@ -10,7 +10,8 @@ export interface Suggestion {
   islandId: string;
   kind: SuggestionKind;
   message: string;
-  fixLabel?: string; // present when a code action can fix it
+  shortLabel?: string; // short version shown in webview badges
+  fixLabel?: string;   // present when a code action can fix it
 }
 
 export interface SuggestionEngineConfig {
@@ -50,6 +51,7 @@ export function generateSuggestions(
           message:
             `${island.componentName} is ~${fmt(size.sizeGzip)} gzipped and hydrates immediately (client:load). ` +
             `Consider client:idle or client:visible to defer hydration.`,
+          shortLabel: `Large eager (~${fmt(size.sizeGzip)})`,
           fixLabel: 'Convert to client:idle',
         });
       }
@@ -63,6 +65,7 @@ export function generateSuggestions(
         message:
           `${island.componentName} has no detected state, hooks, or event handlers. ` +
           `It may not need a hydration directive and could render statically.`,
+        shortLabel: 'No interactive logic',
         fixLabel: 'Remove hydration directive',
       });
     }
@@ -77,6 +80,7 @@ export function generateSuggestions(
           message:
             `${island.componentName} is the only ${island.framework} island on this page, ` +
             `adding ~${runtimeKB} KB of ${island.framework} runtime that is not otherwise needed.`,
+          shortLabel: `Framework cost +${runtimeKB} KB`,
         });
       }
     }
