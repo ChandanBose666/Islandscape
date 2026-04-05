@@ -6,9 +6,6 @@
 src/**
 webview-ui/**
 
-# Walkthrough markdown (embedded in package.json, not bundled as files)
-# Keep walkthrough/ included so VSCode can load the markdown at runtime
-
 # Config & tooling
 .github/**
 tsconfig*.json
@@ -16,11 +13,18 @@ esbuild.config.js
 .eslintrc*
 .eslintignore
 
-# node_modules — runtime deps that esbuild bundles into out/ can be excluded.
-# Keep svelte and @vue/compiler-sfc because they are loaded dynamically at runtime
-# (marked external in esbuild, NOT bundled into out/extension.js).
+# Exclude all node_modules by default, then whitelist runtime deps below.
+# These packages are marked external in esbuild (not bundled into out/extension.js)
+# so they MUST be present in the VSIX node_modules at runtime.
 node_modules/**
+
+# @astrojs/compiler — WASM-based parser, cannot be bundled by esbuild
+!node_modules/@astrojs/compiler/**
+
+# svelte/compiler — dynamically required for SFC size estimation
 !node_modules/svelte/**
+
+# @vue/compiler-sfc and its peer deps — dynamically required for Vue SFC estimation
 !node_modules/@vue/compiler-sfc/**
 !node_modules/@vue/compiler-core/**
 !node_modules/@vue/compiler-dom/**
@@ -30,7 +34,6 @@ node_modules/**
 !node_modules/magic-string/**
 !node_modules/postcss/**
 !node_modules/source-map-js/**
-!node_modules/@astrojs/compiler/**
 
 # Source maps (comment out to keep for debugging)
 out/**/*.map
